@@ -1,17 +1,12 @@
-import sys
 import os
-
-# Add the project root directory to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.components.model_trainer import ModelTrainerConfig
-from src.components.model_trainer import ModelTrainer
+import sys
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from src.components.data_transformation import DataTransformation
 from src.exception import CustomException
 from src.logger import logging
-import pandas as pd
-from src.components.data_transformation import DataTransformation
-from src.components.data_transformation import DataTransformationConfig
-from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
+from src.components.model_trainer import ModelTrainerConfig, ModelTrainer
 
 @dataclass
 class DataIngestionConfig:
@@ -22,12 +17,21 @@ class DataIngestionConfig:
 class DataIngestion:
     def __init__(self):
         self.ingestion_config = DataIngestionConfig()
+        logging.info("DataIngestion initialized with config: %s", self.ingestion_config)
 
     def initiate_data_ingestion(self):
-        logging.info("Entered the data ingestion method or component")
+        logging.info("Entered the data ingestion method")
         try:
             df = pd.read_csv('Notebook/data/daily-bike-share.csv')
             logging.info('Read the dataset as dataframe')
+
+            # Check if 'dteday' exists
+            if 'dteday' not in df.columns:
+                raise ValueError("'dteday' column is missing from the dataset")
+
+            # Extract 'day' from 'dteday' and drop 'dteday'
+            df['day'] = pd.DatetimeIndex(df['dteday']).day
+            df.drop(columns=['dteday'], inplace=True)
 
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
 
@@ -48,12 +52,12 @@ class DataIngestion:
         except Exception as e:
             raise CustomException(e, sys)
 
-if __name__=="__main__":
-    obj=DataIngestion()
-    train_data,test_data=obj.initiate_data_ingestion()
+if __name__ == "__main__":
+    obj = DataIngestion()
+    train_data, test_data = obj.initiate_data_ingestion()
 
-    data_transformation=DataTransformation()
-    train_arr,test_arr,_=data_transformation.initiate_data_transformation(train_data,test_data)
+    data_transformation = DataTransformation()
+    train_arr, test_arr, _ = data_transformation.initiate_data_transformation(train_data, test_data)
 
-    modeltrainer=ModelTrainer()
-    print(modeltrainer.initiate_model_trainer(train_arr,test_arr))
+    modeltrainer = ModelTrainer()
+    print(modeltrainer.initiate_model_trainer(train_arr, test_arr))

@@ -29,7 +29,7 @@ class DataTransformation:
         try:
             numerical_columns = ['temp', 'atemp', 'hum', 'windspeed']
             categorical_columns = ['season', 'mnth', 'holiday', 'weekday', 'workingday', 'weathersit']
-            date_column = 'dteday'
+            date_column = 'day'
 
             num_pipeline = Pipeline(
                 steps=[
@@ -71,11 +71,8 @@ class DataTransformation:
 
     @staticmethod
     def extract_date_features(df):
-        df = pd.DataFrame(df, columns=['dteday'])
-        df['year'] = pd.to_datetime(df['dteday']).dt.year
-        df['month'] = pd.to_datetime(df['dteday']).dt.month
-        df['day'] = pd.to_datetime(df['dteday']).dt.day
-        return df.drop(columns=['dteday'])
+        df = pd.DataFrame(df, columns=['day'])
+        return df  # or perform any additional transformations you need
 
     def initiate_data_transformation(self, train_path, test_path):
         try:
