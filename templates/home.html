@@ -49,85 +49,60 @@
         }
         .results {
             margin-top: 20px;
-        }
-        .results h2 {
-            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
+    <h1>Bike Rental Prediction</h1>
     <div class="container">
-        <h1>Bike Rental Prediction</h1>
-        <form id="predictionForm">
-            <label for="dteday">Date</label>
-            <input type="date" id="dteday" name="dteday" required>
-            
+        <form method="POST">
             <label for="season">Season</label>
             <input type="number" id="season" name="season" min="1" max="4" required>
+
             
-            <label for="yr">Year</label>
-            <input type="number" id="yr" name="yr" min="0" max="1" required>
-            
+
             <label for="mnth">Month</label>
             <input type="number" id="mnth" name="mnth" min="1" max="12" required>
-            
-            <label for="holiday">Holiday</label>
+
+            <label for="day">Day</label>
+            <input type="number" id="day" name="day" min="1" max="31" required>
+
+            <label for="holiday">Holiday (0 for No, 1 for Yes)</label>
             <input type="number" id="holiday" name="holiday" min="0" max="1" required>
-            
-            <label for="weekday">Weekday</label>
+
+            <label for="weekday">Weekday (0-6, 0 for Sunday)</label>
             <input type="number" id="weekday" name="weekday" min="0" max="6" required>
-            
-            <label for="workingday">Working Day</label>
+
+            <label for="workingday">Working Day (0 for No, 1 for Yes)</label>
             <input type="number" id="workingday" name="workingday" min="0" max="1" required>
-            
-            <label for="weathersit">Weather Situation</label>
+
+            <label for="weathersit">Weather Situation (1-4)</label>
             <input type="number" id="weathersit" name="weathersit" min="1" max="4" required>
-            
-            <label for="temp">Temperature</label>
-            <input type="number" id="temp" name="temp" step="0.1" required>
-            
-            <label for="atemp">Feels Like Temperature</label>
-            <input type="number" id="atemp" name="atemp" step="0.1" required>
-            
-            <label for="hum">Humidity</label>
-            <input type="number" id="hum" name="hum" step="0.1" required>
-            
-            <label for="windspeed">Windspeed</label>
-            <input type="number" id="windspeed" name="windspeed" step="0.1" required>
-            
-            <button type="button" onclick="submitForm()">Predict</button>
+
+            <label for="temp">Temperature (Normalized)</label>
+            <input type="number" step="any" id="temp" name="temp" required>
+
+            <label for="atemp">Feels Like Temperature (Normalized)</label>
+            <input type="number" step="any" id="atemp" name="atemp" required>
+
+            <label for="hum">Humidity (Normalized)</label>
+            <input type="number" step="any" id="hum" name="hum" required>
+
+            <label for="windspeed">Windspeed (Normalized)</label>
+            <input type="number" step="any" id="windspeed" name="windspeed" required>
+
+            <button type="submit">Predict</button>
         </form>
-        <div class="results" id="results">
-            <h2>Prediction Results</h2>
-            <p id="predictionOutput"></p>
+
+        {% if prediction is not none %}
+        <div class="results">
+            <h2>Prediction: {{ prediction }}</h2>
         </div>
+        {% endif %}
     </div>
-    
-    <script>
-        function submitForm() {
-            const form = document.getElementById('predictionForm');
-            const formData = new FormData(form);
-            const data = {};
-            
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                document.getElementById('predictionOutput').innerText = `Predicted Bike Rentals: ${result.prediction}`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
 </body>
 </html>

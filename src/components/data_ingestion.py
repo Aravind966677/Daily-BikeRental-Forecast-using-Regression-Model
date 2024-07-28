@@ -33,6 +33,14 @@ class DataIngestion:
             df['day'] = pd.DatetimeIndex(df['dteday']).day
             df.drop(columns=['dteday'], inplace=True)
 
+            # Select only the required columns
+            required_columns = [
+                 'season', 'mnth', 'holiday', 'weekday', 
+                'workingday', 'weathersit', 'temp', 'atemp', 'hum', 'windspeed', 
+                'rentals', 'day'
+            ]
+            df = df[required_columns]
+
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
 
             df.to_csv(self.ingestion_config.raw_data_path, index=False, header=True)
